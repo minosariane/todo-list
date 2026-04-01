@@ -68,7 +68,7 @@ mod tests {
     use super::*;
 
     #[derive(Debug)]
-    pub struct MockStorage {
+    struct MockStorage {
         pub tasks: Vec<Task>,
         pub load_fail: bool,
         pub save_fail: bool,
