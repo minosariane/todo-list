@@ -1,7 +1,5 @@
 #[cfg(test)]
-use crate::{model::{Task, TaskError}, storage::Storage};
-
-#[cfg(test)]
+use crate::{Task, model::TaskError, storage::Storage};
 
 #[cfg(test)]
 pub struct MemoryStorage;

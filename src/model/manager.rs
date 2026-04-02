@@ -1,4 +1,8 @@
-use crate::{model::{Task, TaskError, task::Status}, storage::Storage};
+use crate::{
+    Task,
+    model::{TaskError, task::Status},
+    storage::Storage,
+};
 
 pub struct Manager<S: Storage> {
     storage: S,

@@ -1,4 +1,4 @@
-use crate::model::{Task, TaskError};
+use crate::{Task, model::TaskError};
 
 pub mod json_storage;
 pub mod memory_storage;
