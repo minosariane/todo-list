@@ -1,11 +1,11 @@
 pub mod model;
-pub use model::Task;
-pub use model::TaskError;
+pub use model::task::Task;
 pub use model::task;
-pub use model::Manager;
+pub use model::manager::Manager;
+pub use model::error::TaskError;
 pub mod storage;
 pub use storage::Storage;
-pub use storage::JsonStorage;
+pub use storage::json_storage::JsonStorage;
 pub mod cli;
 pub use cli::Cli;
 pub use cli::Commands;

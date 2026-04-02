@@ -1,5 +1,6 @@
 use code::{Cli, Commands, JsonStorage, Manager};
 use clap::Parser;
+
 fn main() {
     let cli = Cli::parse();
 

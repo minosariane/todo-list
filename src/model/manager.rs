@@ -1,7 +1,5 @@
 use crate::{Storage, Task, TaskError, task::Status};
 
-
-
 pub struct Manager<S: Storage> {
     storage: S,
     pub tasks: Vec<Task>,
