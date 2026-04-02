@@ -1,10 +1,5 @@
-mod cli;
-
+use code::{Cli, Commands, JsonStorage, Manager};
 use clap::Parser;
-use code::{model::manager::Manager, storage::json_storage::JsonStorage};
-
-use crate::cli::{Cli, Commands};
-
 fn main() {
     let cli = Cli::parse();
 

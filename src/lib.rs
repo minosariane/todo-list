@@ -1,5 +1,11 @@
 pub mod model;
+pub use model::Manager;
+pub use model::Task;
 pub mod storage;
+pub use storage::json_storage::JsonStorage;
+pub mod cli;
+pub use cli::Cli;
+pub use cli::Commands;
 
 #[cfg(test)]
 mod tests {
