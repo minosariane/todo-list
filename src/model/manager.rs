@@ -1,5 +1,10 @@
-
-use crate::{model::{error::TaskError, task::{Status, Task}}, storage::Storage};
+use crate::{
+    model::{
+        error::TaskError,
+        task::{Status, Task},
+    },
+    storage::Storage,
+};
 
 pub struct Manager<S: Storage> {
     storage: S,
@@ -15,13 +20,13 @@ impl<S: Storage> Manager<S> {
     pub fn add_task(&mut self, title: String) -> Result<(), TaskError> {
         let task = Task::new(
             self.tasks.iter().map(|t| t.id).max().unwrap_or(0) + 1,
-            title
+            title,
         );
         self.tasks.push(task);
         self.storage.save(&self.tasks)?;
         Ok(())
     }
-    
+
     pub fn list_task(&self) {
         if !&self.tasks.is_empty() {
             for task in &self.tasks {

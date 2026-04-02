@@ -7,4 +7,3 @@ pub trait Storage {
     fn load(&self) -> Result<Vec<Task>, TaskError>;
     fn save(&self, tasks: &Vec<Task>) -> Result<(), TaskError>;
 }
-

@@ -1,48 +1,43 @@
-use std::env;
+mod cli;
 
+use clap::Parser;
 use code::{model::manager::Manager, storage::json_storage::JsonStorage};
 
+use crate::cli::{Cli, Commands};
+
 fn main() {
+    let cli = Cli::parse();
+
     let storage = JsonStorage {
         path: "tasks.json".to_string(),
     };
 
-    let mut manager = Manager::new(storage)
-        .unwrap_or_else(|e| {
-            eprintln!("Failed to load task: {}", e);
-            std::process::exit(1);
-        });
+    let mut manager = Manager::new(storage).unwrap_or_else(|e| {
+        eprintln!("Failed to load task: {}", e);
+        std::process::exit(1);
+    });
 
-    let args: Vec<String> = env::args().collect();
-
-    match args.get(1).map(|s| s.as_str()) {
-        Some("add") => {
-            if let Some(title) = args.get(2) {
-                manager.add_task(title.to_string()).unwrap_or_else(|e| {
-                    eprintln!("Error: {}", e);
-                    std::process::exit(1);
-                });
-            }
+    match cli.command {
+        Commands::Add { title } => {
+            manager.add_task(title.to_string()).unwrap_or_else(|e| {
+                eprintln!("Error: {}", e);
+                std::process::exit(1);
+            });
         }
-        Some("list") => manager.list_task(),
-        Some("done") => {
-            if let Some(id) = args.get(2) {
-                let id = id.parse().unwrap();
-                manager.mark_done(id).unwrap_or_else(|e| {
-                    eprintln!("Error: {}", e);
-                    std::process::exit(1);
-                });
-            }
+        Commands::List => {
+            manager.list_task();
         }
-        Some("remove") => {
-            if let Some(id) = args.get(2) {
-                let id = id.parse().unwrap();
-                manager.remove_task(id).unwrap_or_else(|e| {
-                    eprintln!("Error: {}", e);
-                    std::process::exit(1);
-                });
-            }
+        Commands::Done { id } => {
+            manager.mark_done(id).unwrap_or_else(|e| {
+                eprintln!("Error: {}", e);
+                std::process::exit(1);
+            });
         }
-        _ => println!("Unkown command"),
+        Commands::Remove { id } => {
+            manager.remove_task(id).unwrap_or_else(|e| {
+                eprintln!("Error: {}", e);
+                std::process::exit(1);
+            });
+        }
     }
 }

@@ -1,11 +1,18 @@
-pub mod storage;
 pub mod model;
+pub mod storage;
 
 #[cfg(test)]
 mod tests {
     use std::vec;
 
-    use crate::{model::{error::TaskError, manager::Manager, task::{Status, Task}}, storage::{Storage, memory_storage::MemoryStorage}};
+    use crate::{
+        model::{
+            error::TaskError,
+            manager::Manager,
+            task::{Status, Task},
+        },
+        storage::{Storage, memory_storage::MemoryStorage},
+    };
 
     #[derive(Debug)]
     struct MockStorage {
@@ -18,15 +25,15 @@ mod tests {
         fn load(&self) -> Result<Vec<Task>, TaskError> {
             if self.load_fail == true {
                 Err(TaskError::StorageError("Load fail".into()))
-            }else {
+            } else {
                 Ok(self.tasks.clone())
             }
         }
-    
+
         fn save(&self, _tasks: &Vec<Task>) -> Result<(), TaskError> {
             if self.save_fail == true {
                 Err(TaskError::StorageError("Save fail".into()))
-            }else {
+            } else {
                 Ok(())
             }
         }
