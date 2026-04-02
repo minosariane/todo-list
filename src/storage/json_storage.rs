@@ -1,7 +1,6 @@
 use std::{fs, io::ErrorKind};
 
-use crate::modules::{error::TaskError, task::Task};
-use super::Storage;
+use crate::{model::{error::TaskError, task::Task}, storage::Storage};
 
 pub struct JsonStorage {
     pub path: String,

@@ -1,12 +1,12 @@
 #[cfg(test)]
-use crate::modules::{error::TaskError, task::Task};
+use crate::{model::{error::TaskError, task::Task}, storage::Storage};
 
 #[cfg(test)]
 pub struct MemoryStorage;
 
 #[cfg(test)]
-impl super::Storage for MemoryStorage {
-    fn load(&self) -> Result<Vec<super::task::Task>, TaskError> {
+impl Storage for MemoryStorage {
+    fn load(&self) -> Result<Vec<Task>, TaskError> {
         Ok(vec![])
     }
     

@@ -1,8 +1,6 @@
-mod modules;
-
 use std::env;
 
-use crate::modules::{manager::Manager, json_storage::JsonStorage};
+use code::{model::manager::Manager, storage::json_storage::JsonStorage};
 
 fn main() {
     let storage = JsonStorage {
