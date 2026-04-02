@@ -1,23 +1,19 @@
 pub mod model;
-pub use model::Manager;
 pub use model::Task;
+pub use model::TaskError;
+pub use model::task;
+pub use model::Manager;
 pub mod storage;
-pub use storage::json_storage::JsonStorage;
+pub use storage::Storage;
+pub use storage::JsonStorage;
 pub mod cli;
 pub use cli::Cli;
 pub use cli::Commands;
 
 #[cfg(test)]
 mod tests {
-    use std::vec;
-
     use crate::{
-        model::{
-            error::TaskError,
-            manager::Manager,
-            task::{Status, Task},
-        },
-        storage::{Storage, memory_storage::MemoryStorage},
+        Manager, Storage, Task, TaskError, storage::memory_storage::MemoryStorage, task::Status
     };
 
     #[derive(Debug)]

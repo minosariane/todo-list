@@ -1,5 +1,5 @@
 #[cfg(test)]
-use crate::{Task, model::TaskError, storage::Storage};
+use crate::{Storage, Task, TaskError};
 
 #[cfg(test)]
 pub struct MemoryStorage;
