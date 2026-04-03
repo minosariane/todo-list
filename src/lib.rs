@@ -16,6 +16,8 @@ mod tests {
     use super::*;
 
     mod storage_tests {
+        use std::fs;
+        use tempfile::NamedTempFile;
         use super::*;
         
         #[derive(Debug)]
@@ -67,6 +69,53 @@ mod tests {
             let mut manager = Manager::new(storage).unwrap();
             let result = manager.add_task("test".to_string());
 
+            assert!(result.is_err());
+        }
+
+        #[test]
+        fn json_storage_save_and_load() {
+            let file = NamedTempFile::new().unwrap();
+            let path = file.path().to_str().unwrap().to_string();
+
+            let storage = JsonStorage {
+                path: path
+            };
+
+            let tasks = vec![
+                Task::new(1, "A".to_string()),
+                Task::new(2, "B".to_string()),
+            ];
+
+            storage.save(&tasks).unwrap();
+
+            let loaded = storage.load().unwrap();
+
+            assert_eq!(loaded.len(), 2);
+            assert_eq!(loaded[0].name, "A");
+        }
+
+        #[test]
+        fn json_storage_invalid_path() {
+            let path = "non-existant.json".to_string();
+            let storage = JsonStorage {
+                path: path
+            };
+            let result = storage.load();
+            assert!(result.is_ok());
+            assert!(result.unwrap().is_empty());
+        }
+
+        #[test]
+        fn json_storage_corrupted_json() {
+            let file = NamedTempFile::new().unwrap();
+            let path = file.path().to_str().unwrap().to_string();
+            fs::write(&path, "Totally not json format").unwrap();
+
+            let storage = JsonStorage {
+                path: path
+            };
+
+            let result = storage.load();
             assert!(result.is_err());
         }
     }
