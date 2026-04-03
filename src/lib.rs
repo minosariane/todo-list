@@ -16,10 +16,10 @@ mod tests {
     use super::*;
 
     mod storage_tests {
+        use super::*;
         use std::fs;
         use tempfile::NamedTempFile;
-        use super::*;
-        
+
         #[derive(Debug)]
         struct MockStorage {
             pub tasks: Vec<Task>,
@@ -77,14 +77,9 @@ mod tests {
             let file = NamedTempFile::new().unwrap();
             let path = file.path().to_str().unwrap().to_string();
 
-            let storage = JsonStorage {
-                path: path
-            };
+            let storage = JsonStorage { path: path };
 
-            let tasks = vec![
-                Task::new(1, "A".to_string()),
-                Task::new(2, "B".to_string()),
-            ];
+            let tasks = vec![Task::new(1, "A".to_string()), Task::new(2, "B".to_string())];
 
             storage.save(&tasks).unwrap();
 
@@ -97,9 +92,7 @@ mod tests {
         #[test]
         fn json_storage_invalid_path() {
             let path = "non-existant.json".to_string();
-            let storage = JsonStorage {
-                path: path
-            };
+            let storage = JsonStorage { path: path };
             let result = storage.load();
             assert!(result.is_ok());
             assert!(result.unwrap().is_empty());
@@ -111,9 +104,7 @@ mod tests {
             let path = file.path().to_str().unwrap().to_string();
             fs::write(&path, "Totally not json format").unwrap();
 
-            let storage = JsonStorage {
-                path: path
-            };
+            let storage = JsonStorage { path: path };
 
             let result = storage.load();
             assert!(result.is_err());

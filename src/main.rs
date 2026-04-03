@@ -1,5 +1,5 @@
-use code::{Cli, Commands, JsonStorage, Manager};
 use clap::Parser;
+use code::{Cli, Commands, JsonStorage, Manager};
 
 fn main() {
     let cli = Cli::parse();
