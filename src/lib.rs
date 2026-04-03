@@ -1,8 +1,8 @@
 pub mod model;
-pub use model::task::Task;
-pub use model::task;
-pub use model::manager::Manager;
 pub use model::error::TaskError;
+pub use model::manager::Manager;
+pub use model::task;
+pub use model::task::Task;
 pub mod storage;
 pub use storage::Storage;
 pub use storage::json_storage::JsonStorage;
@@ -12,117 +12,128 @@ pub use cli::Commands;
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        Manager, Storage, Task, TaskError, storage::memory_storage::MemoryStorage, task::Status
-    };
 
-    #[derive(Debug)]
-    struct MockStorage {
-        pub tasks: Vec<Task>,
-        pub load_fail: bool,
-        pub save_fail: bool,
-    }
+    use super::*;
 
-    impl Storage for MockStorage {
-        fn load(&self) -> Result<Vec<Task>, TaskError> {
-            if self.load_fail == true {
-                Err(TaskError::StorageError("Load fail".into()))
-            } else {
-                Ok(self.tasks.clone())
+    mod storage_tests {
+        use super::*;
+        
+        #[derive(Debug)]
+        struct MockStorage {
+            pub tasks: Vec<Task>,
+            pub load_fail: bool,
+            pub save_fail: bool,
+        }
+
+        impl Storage for MockStorage {
+            fn load(&self) -> Result<Vec<Task>, TaskError> {
+                if self.load_fail == true {
+                    Err(TaskError::StorageError("Load fail".into()))
+                } else {
+                    Ok(self.tasks.clone())
+                }
+            }
+
+            fn save(&self, _tasks: &Vec<Task>) -> Result<(), TaskError> {
+                if self.save_fail == true {
+                    Err(TaskError::StorageError("Save fail".into()))
+                } else {
+                    Ok(())
+                }
             }
         }
 
-        fn save(&self, _tasks: &Vec<Task>) -> Result<(), TaskError> {
-            if self.save_fail == true {
-                Err(TaskError::StorageError("Save fail".into()))
-            } else {
-                Ok(())
-            }
+        #[test]
+        fn load_fail() {
+            let storage = MockStorage {
+                tasks: vec![],
+                load_fail: true,
+                save_fail: false,
+            };
+
+            let manager = Manager::new(storage);
+
+            assert!(matches!(manager, Err(TaskError::StorageError(_))));
+        }
+
+        #[test]
+        fn save_fail() {
+            let storage = MockStorage {
+                tasks: vec![],
+                load_fail: false,
+                save_fail: true,
+            };
+
+            let mut manager = Manager::new(storage).unwrap();
+            let result = manager.add_task("test".to_string());
+
+            assert!(result.is_err());
         }
     }
 
-    #[test]
-    fn load_fail() {
-        let storage = MockStorage {
-            tasks: vec![],
-            load_fail: true,
-            save_fail: false,
-        };
+    mod manager_tests {
 
-        let manager = Manager::new(storage);
+        use super::*;
+        use crate::{storage::memory_storage::MemoryStorage, task::Status};
 
-        assert!(matches!(manager, Err(TaskError::StorageError(_))));
-    }
+        #[test]
+        fn add_task() {
+            let storage = MemoryStorage;
+            let mut manager = Manager::new(storage).unwrap();
 
-    #[test]
-    fn save_fail() {
-        let storage = MockStorage {
-            tasks: vec![],
-            load_fail: false,
-            save_fail: true,
-        };
+            manager.add_task("test".to_string()).unwrap();
 
-        let mut manager = Manager::new(storage).unwrap();
-        let result = manager.add_task("test".to_string());
+            assert_eq!(manager.tasks.len(), 1);
+            assert_eq!(manager.tasks[0].name, "test");
+        }
 
-        assert!(result.is_err());
-    }
+        #[test]
+        fn remove_task() {
+            let storage = MemoryStorage;
+            let mut manager = Manager::new(storage).unwrap();
 
-    #[test]
-    fn test_add_task() {
-        let storage = MemoryStorage;
-        let mut manager = Manager::new(storage).unwrap();
+            manager.add_task("A".to_string()).unwrap();
+            manager.add_task("B".to_string()).unwrap();
+            manager.remove_task(1).unwrap();
 
-        manager.add_task("test".to_string()).unwrap();
+            assert_eq!(manager.tasks.len(), 1);
+            assert_eq!(manager.tasks[0].name, "B");
+        }
 
-        assert_eq!(manager.tasks.len(), 1);
-        assert_eq!(manager.tasks[0].name, "test");
-    }
+        #[test]
+        fn mark_done() {
+            let storage = MemoryStorage;
+            let mut manager = Manager::new(storage).unwrap();
 
-    #[test]
-    fn test_remove_task() {
-        let storage = MemoryStorage;
-        let mut manager = Manager::new(storage).unwrap();
+            manager.add_task("test".to_string()).unwrap();
+            manager.mark_done(1).unwrap();
 
-        manager.add_task("task 1".to_string()).unwrap();
-        manager.add_task("task 2".to_string()).unwrap();
-        manager.remove_task(1).unwrap();
+            assert!(matches!(manager.tasks[0].status, Status::Done));
+        }
 
-        assert_eq!(manager.tasks.len(), 1);
-        assert_eq!(manager.tasks[0].name, "task 2");
-    }
+        #[test]
+        fn error_not_found() {
+            let storage = MemoryStorage;
+            let mut manager = Manager::new(storage).unwrap();
+            manager.add_task("test".to_string()).unwrap();
 
-    #[test]
-    fn test_mark_done() {
-        let storage = MemoryStorage;
-        let mut manager = Manager::new(storage).unwrap();
+            let remove = manager.remove_task(42);
+            assert!(remove.is_err());
+            let mark_done = manager.mark_done(42);
+            assert!(mark_done.is_err());
+        }
 
-        manager.add_task("task 1".to_string()).unwrap();
-        manager.mark_done(1).unwrap();
+        #[test]
+        fn full_flow() {
+            let storage = MemoryStorage;
+            let mut manager = Manager::new(storage).unwrap();
+            manager.add_task("A".to_string()).unwrap();
+            manager.add_task("B".to_string()).unwrap();
+            manager.mark_done(1).unwrap();
+            manager.remove_task(2).unwrap();
 
-        assert!(matches!(manager.tasks[0].status, Status::Done));
-    }
-
-    #[test]
-    fn test_error_not_found() {
-        let storage = MemoryStorage;
-        let mut manager = Manager::new(storage).unwrap();
-        manager.add_task("test".to_string()).unwrap();
-        let result = manager.remove_task(42);
-
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_full_flow() {
-        let storage = MemoryStorage;
-        let mut manager = Manager::new(storage).unwrap();
-        manager.add_task("A".to_string()).unwrap();
-        manager.add_task("B".to_string()).unwrap();
-        manager.mark_done(1).unwrap();
-        manager.remove_task(2).unwrap();
-
-        assert_eq!(manager.tasks.len(), 1);
-        assert!(matches!(manager.tasks[0].status, Status::Done))
+            assert_eq!(manager.tasks.len(), 1);
+            assert!(matches!(manager.tasks[0].status, Status::Done))
+        }
     }
 }
