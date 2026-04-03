@@ -52,7 +52,6 @@ mod tests {
                 load_fail: true,
                 save_fail: false,
             };
-
             let manager = Manager::new(storage);
 
             assert!(matches!(manager, Err(TaskError::StorageError(_))));
@@ -76,13 +75,9 @@ mod tests {
         fn json_storage_save_and_load() {
             let file = NamedTempFile::new().unwrap();
             let path = file.path().to_str().unwrap().to_string();
-
             let storage = JsonStorage { path: path };
-
             let tasks = vec![Task::new(1, "A".to_string()), Task::new(2, "B".to_string())];
-
             storage.save(&tasks).unwrap();
-
             let loaded = storage.load().unwrap();
 
             assert_eq!(loaded.len(), 2);
@@ -103,10 +98,9 @@ mod tests {
             let file = NamedTempFile::new().unwrap();
             let path = file.path().to_str().unwrap().to_string();
             fs::write(&path, "Totally not json format").unwrap();
-
             let storage = JsonStorage { path: path };
-
             let result = storage.load();
+
             assert!(result.is_err());
         }
     }
@@ -120,7 +114,6 @@ mod tests {
         fn add_task() {
             let storage = MemoryStorage;
             let mut manager = Manager::new(storage).unwrap();
-
             manager.add_task("test".to_string()).unwrap();
 
             assert_eq!(manager.tasks.len(), 1);
@@ -131,7 +124,6 @@ mod tests {
         fn remove_task() {
             let storage = MemoryStorage;
             let mut manager = Manager::new(storage).unwrap();
-
             manager.add_task("A".to_string()).unwrap();
             manager.add_task("B".to_string()).unwrap();
             manager.remove_task(1).unwrap();
@@ -144,7 +136,6 @@ mod tests {
         fn mark_done() {
             let storage = MemoryStorage;
             let mut manager = Manager::new(storage).unwrap();
-
             manager.add_task("test".to_string()).unwrap();
             manager.mark_done(1).unwrap();
 
@@ -156,10 +147,11 @@ mod tests {
             let storage = MemoryStorage;
             let mut manager = Manager::new(storage).unwrap();
             manager.add_task("test".to_string()).unwrap();
-
             let remove = manager.remove_task(42);
+            
             assert!(remove.is_err());
             let mark_done = manager.mark_done(42);
+            
             assert!(mark_done.is_err());
         }
 
