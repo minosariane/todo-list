@@ -36,7 +36,7 @@ mod tests {
                 }
             }
 
-            fn save(&self, _tasks: &Vec<Task>) -> Result<(), TaskError> {
+            fn save(&self, _tasks: &[model::task::Task]) -> Result<(), TaskError> {
                 if self.save_fail == true {
                     Err(TaskError::StorageError("Save fail".into()))
                 } else {
@@ -148,10 +148,10 @@ mod tests {
             let mut manager = Manager::new(storage).unwrap();
             manager.add_task("test".to_string()).unwrap();
             let remove = manager.remove_task(42);
-            
+
             assert!(remove.is_err());
             let mark_done = manager.mark_done(42);
-            
+
             assert!(mark_done.is_err());
         }
 

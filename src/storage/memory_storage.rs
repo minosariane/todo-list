@@ -1,5 +1,5 @@
 #[cfg(test)]
-use crate::{Storage, Task, TaskError};
+use crate::{Storage, Task, TaskError, model};
 
 #[cfg(test)]
 pub struct MemoryStorage;
@@ -10,7 +10,7 @@ impl Storage for MemoryStorage {
         Ok(vec![])
     }
 
-    fn save(&self, _tasks: &Vec<Task>) -> Result<(), TaskError> {
+    fn save(&self, _tasks: &[model::task::Task]) -> Result<(), TaskError> {
         Ok(())
     }
 }

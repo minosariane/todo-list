@@ -19,7 +19,7 @@ impl Storage for JsonStorage {
         }
     }
 
-    fn save(&self, tasks: &Vec<Task>) -> Result<(), TaskError> {
+    fn save(&self, tasks: &[Task]) -> Result<(), TaskError> {
         let contents = serde_json::to_string_pretty(&tasks)
             .map_err(|e| TaskError::StorageError(e.to_string()))?;
 
